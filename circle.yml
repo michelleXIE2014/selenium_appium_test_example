@@ -1,0 +1,25 @@
+machine:
+  java:
+    version: oraclejdk8   
+    
+general:
+  artifacts:
+      - "target/"
+      
+
+dependencies:
+  pre:
+    - wget -O ff-release.tar.bz2 'https://archive.mozilla.org/pub/firefox/releases/44.0b9/linux-x86_64/en-US/firefox-44.0b9.tar.bz2' && tar xjf ff-release.tar.bz2
+    - wget https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-5.3.zip  && unzip sonarqube-5.3.zip
+    - bash sonarqube-5.3/bin/linux-x86-64/sonar.sh start
+    - sleep 10
+    - mvn sonar:sonar
+    
+test:
+  override:
+    - mvn test -Dgroups=report
+    - mvn test -Dgroups=remote
+    
+  post:
+    - bash sonarqube-5.3/bin/linux-x86-64/sonar.sh stop
+ 
